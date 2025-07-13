@@ -1,2 +1,34 @@
+# Terraform
 .terraform/
-terraform.tfstate*
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+crash.log
+
+# Executáveis
+*.exe
+*.bin
+*.msi
+*.zip
+*.tar.gz
+*.gz
+
+# Helm
+charts/**/charts/
+charts/**/tmp/
+charts/**/values.schema.json
+charts/**/.DS_Store
+charts/**/.helmignore
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*.bak
+
+# Sistema
+Thumbs.db
+.DS_Store
+git reflog expire --expire=now --all
+git gc --prune=now --aggressive

@@ -13,8 +13,11 @@ variable "cluster_name" {
 variable "my_ip" {
   description = "Seu IP para acesso ao cluster EKS"
   type        = string
-  default     = "187.95.17.152/32"
+  default     = "187.95.17.53/32"
 }
 variable "cluster_version" {
   default = "1.30" 
 }
+
+
+

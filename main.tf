@@ -58,4 +58,30 @@ module "eks" {
     Terraform   = "true"
     Environment = "dev"
   }
+
+  provider "datadog" {}
+
+resource "datadog_dashboard" "ecommerce" {
+  title       = "Ecommerce Dashboard"
+  description = "Monitoramento da aplicação ecommerce"
+  layout_type = "ordered"
+
+  widget {
+    group_definition {
+      title = "CPU por host"
+      layout_type = "ordered"
+      widget {
+        timeseries_definition {
+          title = "CPU %"
+          show_legend = true
+          request {
+            q = "avg:system.cpu.user{*} by {host}"
+            display_type = "line"
+          }
+        }
+      }
+    }
+  }
+}
+
 }

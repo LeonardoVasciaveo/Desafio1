@@ -1,34 +1,43 @@
-# Terraform
-.terraform/
+# ❌ Credenciais sensíveis
+.env
+*.pem
+*.key
+*.crt
+*.csr
+*.pfx
+*.jks
+secrets.*
+credentials
 *.tfstate
 *.tfstate.*
-.terraform.lock.hcl
-crash.log
+.terraform/
 
-# Executáveis
-*.exe
-*.bin
-*.msi
-*.zip
-*.tar.gz
-*.gz
+# ❌ Arquivos locais do AWS CLI
+~/.aws/credentials
+~/.aws/config
 
-# Helm
-charts/**/charts/
-charts/**/tmp/
-charts/**/values.schema.json
-charts/**/.DS_Store
-charts/**/.helmignore
+# ❌ Outputs locais
+*.log
+*.bak
+*.tmp
 
-# Editor
+# ❌ Arquivos temporários e IDEs
 .vscode/
 .idea/
-*.swp
-*.swo
-*.bak
-
-# Sistema
-Thumbs.db
 .DS_Store
-git reflog expire --expire=now --all
-git gc --prune=now --aggressive
+Thumbs.db
+
+# ❌ Binaries e builds
+*.exe
+*.dll
+*.so
+*.out
+*.class
+node_modules/
+dist/
+bin/
+obj/
+
+# ❌ Kubernetes config (opcional)
+kubeconfig
+.kube/

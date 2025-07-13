@@ -76,3 +76,19 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          # ...configuração padrão da sua aplicação
+        - name: otel-collector
+          image: otel/opentelemetry-collector:latest
+          args: ["--config=/etc/otel-collector-config.yaml"]
+          volumeMounts:
+            - name: otel-collector-config
+              mountPath: /etc/otel-collector-config.yaml
+              subPath: otel-collector-config.yaml
+      volumes:
+        - name: otel-collector-config
+          configMap:
+            name: {{ include "ecommerce.fullname" . }}-otel-config
+
+            

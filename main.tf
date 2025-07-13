@@ -24,12 +24,12 @@ module "eks" {
 
   cluster_name    = var.cluster_name
   cluster_version = var.cluster_version
-
-  subnet_ids = module.vpc.private_subnets
-  vpc_id     = module.vpc.vpc_id
+  subnet_ids      = module.vpc.private_subnets
+  vpc_id          = module.vpc.vpc_id
 
   enable_irsa = true
   authentication_mode = "API"
+
   cluster_endpoint_public_access        = true
   cluster_endpoint_public_access_cidrs = [var.my_ip]
   cluster_endpoint_private_access       = true
@@ -58,30 +58,4 @@ module "eks" {
     Terraform   = "true"
     Environment = "dev"
   }
-
-  provider "datadog" {}
-
-resource "datadog_dashboard" "ecommerce" {
-  title       = "Ecommerce Dashboard"
-  description = "Monitoramento da aplicação ecommerce"
-  layout_type = "ordered"
-
-  widget {
-    group_definition {
-      title = "CPU por host"
-      layout_type = "ordered"
-      widget {
-        timeseries_definition {
-          title = "CPU %"
-          show_legend = true
-          request {
-            q = "avg:system.cpu.user{*} by {host}"
-            display_type = "line"
-          }
-        }
-      }
-    }
-  }
-}
-
 }

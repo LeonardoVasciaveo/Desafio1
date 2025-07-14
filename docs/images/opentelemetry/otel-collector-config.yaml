@@ -1,0 +1,16 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+exporters:
+  datadog:
+    api:
+      key: "348b8fedd16ca6e144d339fdc55b3220" #chave revogada
+
+service:
+  pipelines:
+    metrics:
+      receivers: [otlp]
+      exporters: [datadog]

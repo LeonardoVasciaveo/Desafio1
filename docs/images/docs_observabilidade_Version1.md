@@ -1,5 +1,14 @@
 # Observabilidade
 
+## Dashboard 1 - Monitora o tráfego de rede e o uso de cpu no Kubernetes
+
+![Dashboard](dashboard.png)
+
+## Dashboard 2 - Monitora volume de erros 5xx no cluster
+
+![Dashboard 2](dashboard-errors.png)
+
+
 ## Instrumentação
 
 - **OpenTelemetry** implementado na aplicação para:

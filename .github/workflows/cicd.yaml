@@ -6,55 +6,106 @@ on:
       - main
     paths:
       - 'app/**'
+      - 'helm/**'
       - '.github/workflows/cicd.yaml'
 
-jobs:
-  build-and-deploy:
-    name: Build and Deploy to ECR and GitOps
-    runs-on: ubuntu-latest
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: ecommerce-app
+  CLUSTER_NAME: eks-ecommerce-prod
+  KUBE_NAMESPACE: ecommerce
+  ARGOCD_APP_NAME: ecommerce-app  # Novo: Nome da aplicação no ArgoCD
 
-    env:
-      AWS_REGION: us-east-1
-      ECR_REPOSITORY: ecommerce-app
-      IMAGE_TAG: ${{ github.sha }}
-      GITOPS_REPO: https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/LeonardoVasciaveo/Desafio1.git
-      GITOPS_PATH: charts/ecommerce-app
+jobs:
+  build-test-deploy:
+    name: Build, Test and Deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
 
     steps:
-      - name: Checkout código da aplicação
-        uses: actions/checkout@v3
+      # ========== FASE DE BUILD ==========
+      - name: Checkout código
+        uses: actions/checkout@v4
 
-      - name: Configurar credenciais AWS
-        uses: aws-actions/configure-aws-credentials@v3
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login no ECR via OIDC
+        uses: aws-actions/amazon-ecr-login@v2
+        id: ecr-login
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          mask-password: true
+
+      - name: Build e Push da imagem
+        uses: docker/build-push-action@v5
+        with:
+          context: ./app
+          push: true
+          tags: |
+            ${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          sbom: true
+          provenance: true
+
+      # ========== FASE DE TESTES ==========
+      - name: Rodar testes unitários
+        run: |
+          docker run --rm ${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }} \
+            npm test
+
+      - name: Teste de segurança (Trivy)
+        uses: aquasecurity/trivy-action@0.16
+        with:
+          image-ref: ${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          format: 'table'
+          exit-code: '1'
+          severity: 'CRITICAL,HIGH'
+
+      # ========== FASE DE DEPLOY ==========
+      - name: Configurar kubectl para EKS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
           aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_IAM_ROLE }}
 
-      - name: Login no Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-
-      - name: Build da imagem Docker
+      - name: Atualizar GitOps (ArgoCD)
         run: |
-          docker build -t $ECR_REPOSITORY:$IMAGE_TAG ./app
-          docker tag $ECR_REPOSITORY:$IMAGE_TAG ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:$IMAGE_TAG
-
-      - name: Push da imagem pro Amazon ECR
-        run: |
-          docker push ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:$IMAGE_TAG
-
-      - name: Clonar repositório GitOps
-        run: |
-          git clone $GITOPS_REPO gitops
-          cd gitops
-
-      - name: Atualizar values.yaml com nova tag
-        run: |
-          cd gitops/${{ env.GITOPS_PATH }}
-          yq e '.image.tag = "${{ env.IMAGE_TAG }}"' -i values.yaml
+          git clone https://${{ github.token }}@github.com/LeonardoVasciaveo/Desafio1.git gitops
+          cd gitops/helm/ecommerce-app
+          
+          # Atualização segura com yq
+          yq eval -i '.image.tag = "${{ github.sha }}"' values.yaml
+          yq eval -i '.image.repository = "${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_REPOSITORY }}"' values.yaml
+          
+          # Metadata para observabilidade
+          echo "deploy:" >> values.yaml
+          echo "  timestamp: $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> values.yaml
+          echo "  commit: ${{ github.sha }}" >> values.yaml
+          
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add values.yaml
-          git commit -m "Atualizando imagem para tag $IMAGE_TAG"
+          git commit -m "[CI] Deploy ${{ github.sha }} to ${{ env.CLUSTER_NAME}}"
           git push
+
+      # ========== PÓS-DEPLOY ==========
+      - name: Verificar status no ArgoCD
+        run: |
+          kubectl wait --for=condition=healthy application/${{ env.ARGOCD_APP_NAME }} \
+            -n argocd \
+            --timeout=300s
+
+      - name: Notificação no Slack
+        uses: slackapi/slack-github-action@v1
+        if: always()
+        with:
+          channel-id: 'deployments'
+          slack-message: |
+            Deploy ${{ job.status }}:
+            *App*: ${{ env.ARGOCD_APP_NAME }}
+            *Commit*: ${{ github.sha }}
+            *Cluster*: ${{ env.CLUSTER_NAME }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}

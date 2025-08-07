@@ -49,15 +49,3 @@ jobs:
             -n argocd \
             --timeout=300s
 
-      - name: Notificação no Slack
-        uses: slackapi/slack-github-action@v1
-        if: always()
-        with:
-          channel-id: 'deployments'
-          slack-message: |
-            Deploy ${{ job.status }}:
-            *App*: ${{ env.ARGOCD_APP_NAME }}
-            *Commit*: ${{ github.sha }}
-            *Cluster*: ${{ env.CLUSTER_NAME }}
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}

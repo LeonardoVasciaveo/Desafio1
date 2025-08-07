@@ -1,10 +1,3 @@
-# Arquitetura da Solução
-
-## Diagrama de Arquitetura
-
-> **Insira aqui o diagrama (por exemplo, diagram.png)**
->
-> ![Diagrama de Arquitetura](images/datadog-eks.png)
 
 ## Descrição dos Componentes
 

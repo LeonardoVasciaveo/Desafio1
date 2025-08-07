@@ -15,9 +15,19 @@ variable "my_ip" {
   type        = string
   default     = "187.95.17.53/32"
 }
+
 variable "cluster_version" {
-  default = "1.30" 
+  default = "1.30"
 }
 
+variable "datadog_api_key" {
+  description = "Datadog API key"
+  type        = string
+  sensitive   = true
+}
 
-
+variable "app_namespace" {
+  description = "Namespace da aplicação"
+  type        = string
+  default     = "ecommerce"
+}

@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - 'app/**'
-      - 'charts/**'
+      - 'helm/**'
       - '.github/workflows/cicd.yaml'
 
 env:
@@ -73,17 +73,17 @@ jobs:
       - name: Atualizar GitOps (ArgoCD)
         run: |
           git clone https://${{ github.token }}@github.com/LeonardoVasciaveo/Desafio1.git gitops
-          cd gitops/charts/ecommerce
-
+          cd gitops/helm/ecommerce-app
+          
           # Atualização segura com yq
           yq eval -i '.image.tag = "${{ github.sha }}"' values.yaml
           yq eval -i '.image.repository = "${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_REPOSITORY }}"' values.yaml
-
+          
           # Metadata para observabilidade
           echo "deploy:" >> values.yaml
           echo "  timestamp: $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> values.yaml
           echo "  commit: ${{ github.sha }}" >> values.yaml
-
+          
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add values.yaml

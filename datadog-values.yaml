@@ -1,4 +1,5 @@
 datadog:
+  apiKey: "348b8fedd16ca6e144d339fdc55b3220" #chave revogada
   site: datadoghq.com
 
   logs:

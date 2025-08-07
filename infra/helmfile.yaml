@@ -1,0 +1,21 @@
+releases:
+  - name: argocd
+    namespace: argocd
+    chart: argo/argo-cd
+    version: 6.7.12
+    createNamespace: true
+    values: []
+
+  - name: datadog
+    namespace: datadog
+    chart: datadog/datadog
+    version: 3.56.0
+    createNamespace: true
+    values:
+      - ../Itau/Desafio1/datadog-values.yaml
+
+  - name: ecommerce
+    namespace: ecommerce
+    chart: ../Itau/Desafio1/charts/ecommerce
+    createNamespace: true
+    values: []

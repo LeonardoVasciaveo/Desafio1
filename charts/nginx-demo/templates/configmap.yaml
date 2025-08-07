@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-nginx-content
+  labels:
+    app: nginx-demo
+data:
+  index.html: |
+    <html>
+      <head><title>Nginx Demo</title></head>
+      <body>
+        <h1>Welcome to the Nginx Demo!</h1>
+        <p>This is a simple static page served by Nginx.</p>
+      </body>
+    </html>

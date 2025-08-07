@@ -121,3 +121,10 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+apiVersion: v2
+name: ecommerce
+description: Helm chart
+type: application
+version: 0.1.0
+appVersion: "1.16.0"

@@ -28,7 +28,7 @@ O dashboard pode ser acessado diretamente na interface do Datadog, na seção de
 
 ### Exemplo de visualização
 
-![Exemplo de Dashboard Datadog](../images/datadog-eks.png)
+![Exemplo de Dashboard Datadog](datadog-eks.png)
 # Observabilidade
 
 ## Dashboard criado como exemplo para demonstrar a coleta dos dados do EKS

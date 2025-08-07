@@ -26,7 +26,7 @@
 
 > **Insira aqui os prints dos gráficos de SLO do Datadog**
 >
-> ![image1](images/image1.png)
+<!-- Imagem removida: arquivo não encontrado. Adicione se necessário. -->
 
 ---
 

@@ -1,0 +1,65 @@
+{
+  "title": "Desafio1 - EKS & Nginx Demo",
+  "description": "Dashboard para monitoramento do cluster EKS e aplicação Nginx Demo.",
+  "widgets": [
+    {
+      "definition": {
+        "type": "timeseries",
+        "title": "CPU Utilization (EKS Nodes)",
+        "requests": [
+          {
+            "q": "avg:kubernetes.cpu.usage.total{cluster:eks-desafio1} by {node}",
+            "display_type": "line",
+            "style": {
+              "palette": "dog_classic",
+              "line_type": "solid",
+              "line_width": "normal"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "type": "timeseries",
+        "title": "Memory Utilization (EKS Nodes)",
+        "requests": [
+          {
+            "q": "avg:kubernetes.memory.usage{cluster:eks-desafio1} by {node}",
+            "display_type": "line",
+            "style": {
+              "palette": "dog_classic",
+              "line_type": "solid",
+              "line_width": "normal"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "type": "query_value",
+        "title": "Pods Running (demo namespace)",
+        "requests": [
+          {
+            "q": "sum:kubernetes.pods.running{cluster:eks-desafio1,namespace:demo}"
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "type": "query_value",
+        "title": "Pods Pending (demo namespace)",
+        "requests": [
+          {
+            "q": "sum:kubernetes.pods.pending{cluster:eks-desafio1,namespace:demo}"
+          }
+        ]
+      }
+    }
+  ],
+  "layout_type": "ordered",
+  "is_read_only": false,
+  "notify_list": []
+}

@@ -36,8 +36,8 @@
 ## Fluxo do Rollout
 
 1. Código aprovado e mergeado.
-2. Pipeline CI/CD builda imagem, faz push no ECR, atualiza manifest no repositório GitOps.
-3. ArgoCD detecta mudança e inicia rollout.
-4. Rollout é monitorado por probes e métricas no Datadog.
-5. Falha? Rollback automático.
-6. Sucesso? Métricas e logs analisados.
+2. Pipeline CI/CD atualiza o manifest Helm/ArgoCD no repositório GitOps.
+3. ArgoCD detecta a mudança e inicia o rollout no cluster EKS.
+4. O rollout é monitorado por probes de saúde do Kubernetes e métricas no Datadog.
+5. Em caso de falha, rollback automático pelo ArgoCD/Kubernetes.
+6. Em caso de sucesso, métricas e logs são analisados via Datadog.

@@ -9,3 +9,14 @@ data:
       username: leonardo
       groups:
         - system:masters
+  destination:
+    namespace: ecommerce
+    server: https://kubernetes.default.svc
+spec:
+  selector:
+    matchLabels:
+      {{- include "ecommerce.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "ecommerce.selectorLabels" . | nindent 8 }}

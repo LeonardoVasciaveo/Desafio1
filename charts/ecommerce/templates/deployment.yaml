@@ -11,35 +11,49 @@ spec:
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   revisionHistoryLimit: 3
+
   selector:
     matchLabels:
-      {{- include "ecommerce.selectorLabels" . | nindent 6 }}
+      # <-- labels de selector EXATAMENTE idênticas às do template abaixo
+      app.kubernetes.io/name: {{ include "ecommerce.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+
   strategy:
     type: RollingUpdate
     rollingUpdate:
       maxSurge: 25%
       maxUnavailable: 25%
+
   template:
     metadata:
-      annotations:
+      labels:
+        # <-- aqui repetimos exatamente as mesmas duas chaves/valores
+        app.kubernetes.io/name: {{ include "ecommerce.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
         {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+      annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "8888"
         prometheus.io/path: "/metrics"
         sidecar.istio.io/inject: "false"
+
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+
       serviceAccountName: {{ include "ecommerce.serviceAccountName" . }}
+
       {{- with .Values.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+
       terminationGracePeriodSeconds: 30
+
       containers:
         - name: {{ .Chart.Name }}
           {{- with .Values.securityContext }}
@@ -137,6 +151,7 @@ spec:
             items:
               - key: otel-collector-config.yaml
                 path: otel-collector-config.yaml
+
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

@@ -1,29 +1,11 @@
-datadog:
-  apiKey: "348b8fedd16ca6e144d339fdc55b3220" #chave revogada
-  site: datadoghq.com
-
-  logs:
-    enabled: true
-
-  apm:
-    enabled: true
-    receiverPort: 8126
-
-  processAgent:
-    enabled: true
-
-  dogstatsd:
-    useSocketVolume: true
-
-otel:
-  enabled: true
-
-agents:
-  containerLogs:
-    enabled: true
-
-clusterAgent:
-  enabled: true
-
-kubelet:
-  tlsVerify: false
+kind: "DatadogAgent"
+apiVersion: "datadoghq.com/v2alpha1"
+metadata:
+  name: "datadog"
+spec:
+  global:
+    site: "us5.datadoghq.com"
+    credentials:
+      apiSecret:
+        secretName: "datadog-secret"
+        keyName: "api-key"

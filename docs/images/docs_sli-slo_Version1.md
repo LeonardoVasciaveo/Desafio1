@@ -2,37 +2,28 @@
 
 ## Proposta de SLIs/SLOs
 
-### Exemplos de SLIs
 
-- **Disponibilidade da aplicação** (HTTP 2xx/3xx rate)
-- **Latência de resposta** (p95/p99)
-- **Taxa de erros** (HTTP 5xx)
-- **Tempo de build/deploy**
-- **Uso de recursos do cluster (CPU/RAM)**
+### Exemplos de SLIs (baseados no dashboard Datadog ativo)
+
+- **Disponibilidade de pods** (número de pods running no namespace demo)
+- **Uso de CPU dos nodes** (média de utilização de CPU dos nodes EKS)
+- **Uso de memória dos nodes** (média de utilização de memória dos nodes EKS)
+- **Pods pendentes** (número de pods pending no namespace demo)
+
 
 ### SLOs Sugeridos
 
-| SLI                        | SLO Alvo                  |
-|----------------------------|---------------------------|
-| Disponibilidade            | >= 99.9%                  |
-| Latência p95               | <= 300ms                  |
-| Deploy sem erro            | >= 99% dos rollouts       |
-| Taxa de erro HTTP 5xx      | <= 0.1%                   |
-| Uso de CPU por node        | <= 70% (média semanal)    |
+| SLI                                 | SLO Alvo                        |
+|-------------------------------------|---------------------------------|
+| Disponibilidade de pods             | >= 99.9% pods running           |
+| Uso de CPU dos nodes                | <= 70% (média semanal)          |
+| Uso de memória dos nodes            | <= 75% (média semanal)          |
+| Pods pendentes                      | <= 1 pod pending por 95% do tempo |
 
----
-
-## Prints da medição do SLO no Datadog
-
-> **Insira aqui os prints dos gráficos de SLO do Datadog**
->
-> ![image1](images/image1.png)
-
----
 
 ## Justificativas
 
-- **Disponibilidade alta** é essencial para e-commerce (impacto direto na receita).
+- **Disponibilidade alta** é essencial para qualquer aplicação.
 - **Baixa latência** melhora experiência do usuário.
 - **Erros baixos** garantem confiabilidade.
 - **Uso de recursos monitorado** previne incidentes por exaustão.

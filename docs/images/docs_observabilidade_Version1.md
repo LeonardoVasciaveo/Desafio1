@@ -1,43 +1,40 @@
 # Observabilidade
 
-## Dashboard 1 - Monitora o tráfego de rede e o uso de cpu no Kubernetes
+Para garantir visibilidade e confiabilidade do ambiente Kubernetes (EKS) e da aplicação Nginx Demo, foi implementado um dashboard Datadog customizado, focado nos principais indicadores de saúde e performance do cluster e dos workloads.
 
-![Dashboard](dashboard.png)
+## Dashboard Datadog: "Desafio1 - EKS & Nginx Demo"
 
-## Dashboard 2 - Monitora volume de erros 5xx no cluster
+O dashboard foi criado para fornecer uma visão centralizada e em tempo real dos seguintes aspectos:
 
-![Dashboard 2](dashboard-errors.png)
+- **CPU Utilization (EKS Nodes):**
+  Exibe o uso médio de CPU dos nodes do cluster EKS, permitindo identificar rapidamente sobrecarga ou subutilização de recursos.
 
+- **Memory Utilization (EKS Nodes):**
+  Apresenta o consumo de memória por namespace, facilitando a análise de uso e a detecção de possíveis vazamentos ou gargalos.
 
-## Instrumentação
+- **Pods Running (demo namespace):**
+  Mostra a quantidade de pods em execução no namespace de interesse, com destaque visual para situações fora do esperado, permitindo rápida identificação de falhas de disponibilidade.
 
-- **OpenTelemetry** implementado na aplicação para:
-    - Tracing de requisições
-    - Métricas customizadas (latência, erros, throughput)
-    - Exportação para Datadog/Grafana via Otel Collector
+### Benefícios
 
-## Dashboards
+- **Monitoramento proativo:** Permite detectar anomalias e agir antes que impactem o usuário final.
+- **Visão centralizada:** Todos os principais indicadores do cluster e da aplicação em um único painel.
+- **Aderência a SRE:** Métricas essenciais para SLI/SLO, facilitando a gestão de confiabilidade.
 
-**Dashboard 1 - Monitora o tráfego de rede e o uso de cpu no Kubernetes**
-<img width="1086" height="272" alt="image" src="https://github.com/user-attachments/assets/5b8aa35b-db2c-4bdc-879b-66d102a4b117" />
+### Como acessar
 
-**Dashboard 2 - Monitora volume de erros 5xx no cluster**
-<img width="1451" height="701" alt="image" src="https://github.com/user-attachments/assets/73ba125c-b061-4512-99e1-c034e16776ef" />
+O dashboard pode ser acessado diretamente na interface do Datadog, na seção de Dashboards, sob o nome:
+**Desafio1 - EKS & Nginx Demo**
+
+## Dashboard criado como exemplo para demonstrar a coleta dos dados do EKS
+
+![Dashboard](datadog-eks.png)
 
 - **Datadog/Grafana** com:
     - Healthcheck dos componentes do cluster
     - Latência e disponibilidade da aplicação
-    - Uso de CPU/RAM/pods
-    - Traces distribuídos
-
-## Alertas
-
-- **Alertas configurados para:**
-    - Latência alta (>300ms p95)
-    - Queda de disponibilidade (<99.9%)
-    - Erros 5xx acima do limite
-    - Uso de recursos crítico
-
+    - Uso de CPU/Memória/pods
+    
 ## Benefícios
 
 - **Visibilidade fim-a-fim**

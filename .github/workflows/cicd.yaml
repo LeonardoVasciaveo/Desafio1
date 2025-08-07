@@ -1,111 +1,56 @@
-name: CI/CD Pipeline
+name: CI/CD Pipeline Nginx Demo
 
 on:
   push:
     branches:
       - main
     paths:
-      - 'app/**'
-      - 'helm/**'
+      - 'charts/nginx-demo/**'
       - '.github/workflows/cicd.yaml'
 
 env:
   AWS_REGION: us-east-1
-  ECR_REPOSITORY: ecommerce-app
-  CLUSTER_NAME: eks-ecommerce-prod
-  KUBE_NAMESPACE: ecommerce
-  ARGOCD_APP_NAME: ecommerce-app  # Novo: Nome da aplicação no ArgoCD
+  CLUSTER_NAME: eks-desafio1
+  KUBE_NAMESPACE: demo
+  ARGOCD_APP_NAME: nginx-demo
 
 jobs:
-  build-test-deploy:
-    name: Build, Test and Deploy
+  gitops-deploy:
+    name: GitOps Deploy Nginx Demo
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      packages: write
       id-token: write
 
     steps:
-      # ========== FASE DE BUILD ==========
       - name: Checkout código
         uses: actions/checkout@v4
 
-      - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Login no ECR via OIDC
-        uses: aws-actions/amazon-ecr-login@v2
-        id: ecr-login
-        with:
-          mask-password: true
-
-      - name: Build e Push da imagem
-        uses: docker/build-push-action@v5
-        with:
-          context: ./app
-          push: true
-          tags: |
-            ${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
-          sbom: true
-          provenance: true
-
-      # ========== FASE DE TESTES ==========
-      - name: Rodar testes unitários
-        run: |
-          docker run --rm ${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }} \
-            npm test
-
-      - name: Teste de segurança (Trivy)
-        uses: aquasecurity/trivy-action@0.16
-        with:
-          image-ref: ${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
-          format: 'table'
-          exit-code: '1'
-          severity: 'CRITICAL,HIGH'
-
-      # ========== FASE DE DEPLOY ==========
       - name: Configurar kubectl para EKS
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: ${{ env.AWS_REGION }}
-          role-to-assume: ${{ secrets.AWS_IAM_ROLE }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - name: Atualizar GitOps (ArgoCD)
+      - name: Obter kubeconfig do EKS
         run: |
-          git clone https://${{ github.token }}@github.com/LeonardoVasciaveo/Desafio1.git gitops
-          cd gitops/helm/ecommerce-app
-          
-          # Atualização segura com yq
-          yq eval -i '.image.tag = "${{ github.sha }}"' values.yaml
-          yq eval -i '.image.repository = "${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_REPOSITORY }}"' values.yaml
-          
-          # Metadata para observabilidade
-          echo "deploy:" >> values.yaml
-          echo "  timestamp: $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> values.yaml
-          echo "  commit: ${{ github.sha }}" >> values.yaml
-          
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git add values.yaml
-          git commit -m "[CI] Deploy ${{ github.sha }} to ${{ env.CLUSTER_NAME}}"
-          git push
+          aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.CLUSTER_NAME }}
 
-      # ========== PÓS-DEPLOY ==========
-      - name: Verificar status no ArgoCD
+      - name: Build Docker image
         run: |
-          kubectl wait --for=condition=healthy application/${{ env.ARGOCD_APP_NAME }} \
-            -n argocd \
-            --timeout=300s
+          docker build -t nginx-demo:${GITHUB_SHA} -f Dockerfile .
 
-      - name: Notificação no Slack
-        uses: slackapi/slack-github-action@v1
-        if: always()
-        with:
-          channel-id: 'deployments'
-          slack-message: |
-            Deploy ${{ job.status }}:
-            *App*: ${{ env.ARGOCD_APP_NAME }}
-            *Commit*: ${{ github.sha }}
-            *Cluster*: ${{ env.CLUSTER_NAME }}
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+      - name: Login to Amazon ECR
+        run: |
+          aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin 339713018608.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
+
+      - name: Tag Docker image
+        run: |
+          docker tag nginx-demo:${GITHUB_SHA} 339713018608.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/nginx-demo:${GITHUB_SHA}
+
+      - name: Push Docker image
+        run: |
+          docker push 339713018608.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/nginx-demo:${GITHUB_SHA}
+
+

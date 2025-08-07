@@ -1,96 +1,48 @@
-name: CI/CD Pipeline
+
+name: CI/CD Pipeline Nginx Demo
 
 on:
   push:
     branches:
       - main
     paths:
-      - 'app/**'
-      - 'helm/**'
+      - 'charts/nginx-demo/**'
       - '.github/workflows/cicd.yaml'
 
 env:
   AWS_REGION: us-east-1
-  ECR_REPOSITORY: ecommerce-app
   CLUSTER_NAME: eks-ecommerce-prod
-  KUBE_NAMESPACE: ecommerce
-  ARGOCD_APP_NAME: ecommerce-app  # Novo: Nome da aplicação no ArgoCD
+  KUBE_NAMESPACE: demo
+  ARGOCD_APP_NAME: nginx-demo
 
 jobs:
-  build-test-deploy:
-    name: Build, Test and Deploy
+  gitops-deploy:
+    name: GitOps Deploy Nginx Demo
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      packages: write
       id-token: write
 
     steps:
-      # ========== FASE DE BUILD ==========
       - name: Checkout código
         uses: actions/checkout@v4
 
-      - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Login no ECR via OIDC
-        uses: aws-actions/amazon-ecr-login@v2
-        id: ecr-login
-        with:
-          mask-password: true
-
-      - name: Build e Push da imagem
-        uses: docker/build-push-action@v5
-        with:
-          context: ./app
-          push: true
-          tags: |
-            ${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
-          sbom: true
-          provenance: true
-
-      # ========== FASE DE TESTES ==========
-      - name: Rodar testes unitários
-        run: |
-          docker run --rm ${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }} \
-            npm test
-
-      - name: Teste de segurança (Trivy)
-        uses: aquasecurity/trivy-action@0.16
-        with:
-          image-ref: ${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
-          format: 'table'
-          exit-code: '1'
-          severity: 'CRITICAL,HIGH'
-
-      # ========== FASE DE DEPLOY ==========
       - name: Configurar kubectl para EKS
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: ${{ env.AWS_REGION }}
           role-to-assume: ${{ secrets.AWS_IAM_ROLE }}
 
-      - name: Atualizar GitOps (ArgoCD)
+      - name: Atualizar metadata de deploy no values.yaml
         run: |
-          git clone https://${{ github.token }}@github.com/LeonardoVasciaveo/Desafio1.git gitops
-          cd gitops/helm/ecommerce-app
-          
-          # Atualização segura com yq
-          yq eval -i '.image.tag = "${{ github.sha }}"' values.yaml
-          yq eval -i '.image.repository = "${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_REPOSITORY }}"' values.yaml
-          
-          # Metadata para observabilidade
-          echo "deploy:" >> values.yaml
-          echo "  timestamp: $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> values.yaml
-          echo "  commit: ${{ github.sha }}" >> values.yaml
-          
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          git add values.yaml
-          git commit -m "[CI] Deploy ${{ github.sha }} to ${{ env.CLUSTER_NAME}}"
+          yq eval -i '.deploy.timestamp = strenv(DATE)' charts/nginx-demo/values.yaml
+          yq eval -i '.deploy.commit = "${{ github.sha }}"' charts/nginx-demo/values.yaml
+          git add charts/nginx-demo/values.yaml
+          git commit -m "[CI] Atualiza metadata de deploy do Nginx demo"
           git push
 
-      # ========== PÓS-DEPLOY ==========
       - name: Verificar status no ArgoCD
         run: |
           kubectl wait --for=condition=healthy application/${{ env.ARGOCD_APP_NAME }} \

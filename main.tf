@@ -27,7 +27,7 @@ module "eks" {
   subnet_ids      = module.vpc.private_subnets
   vpc_id          = module.vpc.vpc_id
 
-  enable_irsa = true
+  enable_irsa       = true
   authentication_mode = "API"
 
   cluster_endpoint_public_access        = true
@@ -57,5 +57,61 @@ module "eks" {
   tags = {
     Terraform   = "true"
     Environment = "dev"
+  }
+}
+
+data "aws_eks_cluster" "cluster" {
+  name = module.eks.cluster_name
+}
+
+data "aws_eks_cluster_auth" "cluster" {
+  name = module.eks.cluster_name
+}
+
+provider "helm" {
+  kubernetes {
+    host                   = data.aws_eks_cluster.cluster.endpoint
+    cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data)
+    token                  = data.aws_eks_cluster_auth.cluster.token
+  }
+}
+
+provider "kubernetes" {
+  host                   = data.aws_eks_cluster.cluster.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data)
+  token                  = data.aws_eks_cluster_auth.cluster.token
+}
+
+resource "kubernetes_secret" "datadog" {
+  metadata {
+    name      = "datadog-secret"
+    namespace = var.app_namespace
+  }
+  data = {
+    DD_API_KEY = var.datadog_api_key
+    api-key    = var.datadog_api_key
+  }
+}
+
+resource "helm_release" "argocd" {
+  name             = "argocd"
+  repository       = "https://argoproj.github.io/argo-helm"
+  chart            = "argo-cd"
+  namespace        = "argocd"
+  create_namespace = true
+  version          = "5.46.0"
+}
+
+resource "helm_release" "datadog" {
+  name             = "datadog"
+  repository       = "https://helm.datadoghq.com"
+  chart            = "datadog"
+  namespace        = "datadog"
+  create_namespace = true
+  values           = [file("${path.module}/datadog-values.yaml")]
+
+  set_sensitive {
+    name  = "datadog.apiKey"
+    value = var.datadog_api_key
   }
 }

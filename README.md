@@ -1,8 +1,6 @@
-    # Desafio 1 - Modernização de Plataforma E-commerce (SRE)
+# Desafio 1 - Modernização de Plataforma E-commerce (SRE)
 
-<img width="574" height="549" alt="image" src="https://github.com/user-attachments/assets/f9723dd5-57b6-4034-af3b-7a52c1f31bea" />
-
-
+<img width="574" height="549" alt="image" src="https://github.com/user-attachments/assets/f9723dd5-57b6-4034-af3b-7a52c1f31bea"/>
 
 ## Visão Geral
 
@@ -14,6 +12,22 @@ Este repositório apresenta a solução para o Desafio 1 de SRE, que tem como ob
 - Aprimorar a observabilidade
 - Implementar práticas de GitOps
 - Processo de deploy automatizado e seguro
+
+---
+
+## Automação implementada
+
+- Terraform provisiona VPC, EKS e instala **ArgoCD** e **Datadog Agent** via Helm.
+- Chave da API do Datadog é fornecida em tempo de execução (`terraform apply -var="datadog_api_key=SEU_TOKEN"`) e não fica armazenada no repositório.
+- Aplicação de exemplo em Node.js instrumentada com **OpenTelemetry** localizada em `app/`.
+- Chart Helm da aplicação em `charts/ecommerce` com sidecar do collector.
+- Pipeline GitHub Actions constrói a imagem, publica no ECR e atualiza o repositório GitOps automaticamente.
+
+### Como iniciar
+```bash
+terraform init
+terraform apply -var="datadog_api_key=SEU_TOKEN"
+```
 
 ---
 
@@ -31,8 +45,8 @@ Este repositório apresenta a solução para o Desafio 1 de SRE, que tem como ob
 ## Resumo das Entregas
 
 - Provisionamento EKS com Terraform
-- Instalação/configuração do ArgoCD
-- Helm chart simples da aplicação web
+- Instalação/configuração do ArgoCD e Datadog
+- Helm chart da aplicação web
 - Pipeline GitHub Actions: build, push ECR, update GitOps repo
 - Instrumentação com OpenTelemetry
 - Dashboards no Datadog/Grafana

@@ -1,7 +1,7 @@
 replicaCount: 1
 image:
   repository: "339713018608.dkr.ecr.us-east-1.amazonaws.com/nginx-demo"
-  tag: latest
+  tag: "954bd11f92ef463d6ec52ef3118367741bb7be62"
   pullPolicy: IfNotPresent
 service:
   type: LoadBalancer

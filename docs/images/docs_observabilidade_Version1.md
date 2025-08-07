@@ -26,11 +26,6 @@ O dashboard foi criado para fornecer uma visão centralizada e em tempo real dos
 O dashboard pode ser acessado diretamente na interface do Datadog, na seção de Dashboards, sob o nome:
 **Desafio1 - EKS & Nginx Demo**
 
-### Exemplo de visualização
-
-![Exemplo de Dashboard Datadog](datadog-eks.png)
-# Observabilidade
-
 ## Dashboard criado como exemplo para demonstrar a coleta dos dados do EKS
 
 ![Dashboard](datadog-eks.png)

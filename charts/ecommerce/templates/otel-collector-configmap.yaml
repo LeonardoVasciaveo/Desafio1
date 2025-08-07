@@ -12,9 +12,19 @@ data:
     exporters:
       logging:
         loglevel: debug
-      # Configure para enviar para Jaeger, Zipkin, Prometheus, etc
+      datadog:
+        api:
+          key: ${DD_API_KEY}
+          site: datadoghq.com
+      prometheus:
+        endpoint: "0.0.0.0:8889"
+        send_timestamps: true
+        metric_expiration: 60m
     service:
       pipelines:
         traces:
           receivers: [otlp]
-          exporters: [logging]
+          exporters: [logging, datadog]
+        metrics:
+          receivers: [otlp]
+          exporters: [logging, prometheus]

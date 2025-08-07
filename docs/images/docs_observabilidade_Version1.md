@@ -14,7 +14,7 @@
 - **OpenTelemetry** implementado na aplicação para:
     - Tracing de requisições
     - Métricas customizadas (latência, erros, throughput)
-    - Exportação para Datadog/Grafana via Otel Collector
+    - Exportação para Datadog e Prometheus via Otel Collector
 
 ## Dashboards
 
@@ -24,7 +24,7 @@
 **Dashboard 2 - Monitora volume de erros 5xx no cluster**
 <img width="1451" height="701" alt="image" src="https://github.com/user-attachments/assets/73ba125c-b061-4512-99e1-c034e16776ef" />
 
-- **Datadog/Grafana** com:
+- **Datadog e Grafana (via Prometheus)** com:
     - Healthcheck dos componentes do cluster
     - Latência e disponibilidade da aplicação
     - Uso de CPU/RAM/pods

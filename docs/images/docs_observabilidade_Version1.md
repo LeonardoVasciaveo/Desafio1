@@ -33,17 +33,8 @@ O dashboard pode ser acessado diretamente na interface do Datadog, na seção de
 - **Datadog/Grafana** com:
     - Healthcheck dos componentes do cluster
     - Latência e disponibilidade da aplicação
-    - Uso de CPU/RAM/pods
-    - Traces distribuídos
-
-## Alertas
-
-- **Alertas configurados para:**
-    - Latência alta (>300ms p95)
-    - Queda de disponibilidade (<99.9%)
-    - Erros 5xx acima do limite
-    - Uso de recursos crítico
-
+    - Uso de CPU/Memória/pods
+    
 ## Benefícios
 
 - **Visibilidade fim-a-fim**

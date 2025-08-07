@@ -33,15 +33,9 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - name: Atualizar metadata de deploy no values.yaml
+      - name: Obter kubeconfig do EKS
         run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          yq eval -i '.deploy.timestamp = strenv(DATE)' charts/nginx-demo/values.yaml
-          yq eval -i '.deploy.commit = "${{ github.sha }}"' charts/nginx-demo/values.yaml
-          git add charts/nginx-demo/values.yaml
-          git commit -m "[CI] Atualiza metadata de deploy do Nginx demo"
-          git push
+          aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name eks-desafio1
 
       - name: Verificar status no ArgoCD
         run: |

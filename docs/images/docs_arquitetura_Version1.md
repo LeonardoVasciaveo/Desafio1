@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # Arquitetura da Solução
 
 ## Diagrama de Arquitetura

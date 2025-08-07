@@ -4,7 +4,7 @@
 
 > **Insira aqui o diagrama (por exemplo, diagram.png)**
 >
-> ![Diagrama de Arquitetura](images/topologia-Desafio1.png)
+> ![Diagrama de Arquitetura](images/datadog-eks.png.png)
 
 ## Descrição dos Componentes
 

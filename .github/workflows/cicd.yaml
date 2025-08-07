@@ -37,9 +37,20 @@ jobs:
         run: |
           aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.CLUSTER_NAME }}
 
-      - name: Tag e Push da Imagem para o ECR
+      - name: Build Docker image
         run: |
-          docker tag ${{ env.ECR_REPOSITORY }}:${{ github.sha }} 339713018608.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
-          docker push 339713018608.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          docker build -t nginx-demo:${GITHUB_SHA} charts/nginx-demo
+
+      - name: Login to Amazon ECR
+        run: |
+          aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin 339713018608.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
+
+      - name: Tag Docker image
+        run: |
+          docker tag nginx-demo:${GITHUB_SHA} 339713018608.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/nginx-demo:${GITHUB_SHA}
+
+      - name: Push Docker image
+        run: |
+          docker push 339713018608.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/nginx-demo:${GITHUB_SHA}
 
 

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Arquitetura da Solução
 
 ## Diagrama de Arquitetura
@@ -5,6 +6,8 @@
 > **Insira aqui o diagrama (por exemplo, diagram.png)**
 >
 ![Diagrama de Arquitetura](topologia-Desafio1.png)
+=======
+>>>>>>> f9580bb808074d9e3e8fb993ff4ae7ef10cfb691
 
 ## Descrição dos Componentes
 

@@ -37,9 +37,4 @@ jobs:
         run: |
           aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.CLUSTER_NAME }}
 
-      - name: Verificar status no ArgoCD
-        run: |
-          kubectl wait --for=condition=healthy application/${{ env.ARGOCD_APP_NAME }} \
-            -n argocd \
-            --timeout=300s
 

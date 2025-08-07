@@ -1,14 +1,11 @@
 replicaCount: 1
-
 image:
   repository: nginx
   tag: stable
   pullPolicy: IfNotPresent
-
 service:
   type: LoadBalancer
   port: 80
-
 ingress:
   enabled: false
   className: ""
@@ -19,11 +16,10 @@ ingress:
         - path: /
           pathType: ImplementationSpecific
   tls: []
-
 resources: {}
-
 nodeSelector: {}
-
 tolerations: []
-
 affinity: {}
+deploy:
+  timestamp: ""
+  commit: cfc9c80e66ef42e5fb939a716a4f8c6a26e45c0f

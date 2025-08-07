@@ -35,7 +35,7 @@ jobs:
 
       - name: Obter kubeconfig do EKS
         run: |
-          aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name eks-desafio1
+          aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.CLUSTER_NAME }}
 
       - name: Verificar status no ArgoCD
         run: |

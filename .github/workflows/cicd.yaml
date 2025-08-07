@@ -39,7 +39,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t nginx-demo:${GITHUB_SHA} charts/nginx-demo
+          docker build -t nginx-demo:${GITHUB_SHA} -f Dockerfile .
 
       - name: Login to Amazon ECR
         run: |

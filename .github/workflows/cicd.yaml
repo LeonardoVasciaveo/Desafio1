@@ -10,7 +10,7 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  CLUSTER_NAME: eks-ecommerce-prod
+  CLUSTER_NAME: eks-desafio1
   KUBE_NAMESPACE: demo
   ARGOCD_APP_NAME: nginx-demo
 

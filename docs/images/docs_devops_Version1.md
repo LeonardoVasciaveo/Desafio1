@@ -30,5 +30,4 @@
 
 - **Acesso aos secrets via AWS Secrets Manager**
 - **Políticas de IAM restritivas**
-- **Revisão obrigatória de código**
-- **Proteção de branch principal**
+

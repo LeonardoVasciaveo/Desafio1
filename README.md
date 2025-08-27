@@ -1,9 +1,4 @@
     # Desafio 1 - Modernização de Plataforma (SRE) - Nginx Demo
-
-<img width="574" height="549" alt="image" src="https://github.com/user-attachments/assets/f9723dd5-57b6-4034-af3b-7a52c1f31bea" />
-
-
-
 ## Visão Geral
 
 
